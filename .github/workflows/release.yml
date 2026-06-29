@@ -23,7 +23,7 @@ jobs:
         run: pip install Pillow
 
       - name: Generate icons from source
-        working-directory: Wails
+        working-directory: .
         run: python3 tools/icongen/main.py --project-root .
 
       - name: Upload icon artifacts
@@ -31,11 +31,11 @@ jobs:
         with:
           name: icons
           path: |
-            Wails/build/appicon.png
-            Wails/build/bin/
-            Wails/build/windows/icon.ico
-            Wails/build/icons/
-            Wails/frontend/src/assets/images/logo.png
+            build/appicon.png
+            build/bin/
+            build/windows/icon.ico
+            build/icons/
+            frontend/src/assets/images/logo.png
           retention-days: 1
 
   fetch-xray:
@@ -76,7 +76,7 @@ jobs:
           GEO_EXTRACTED=false
           for platform in "${!PLATFORMS[@]}"; do
             zip="${PLATFORMS[$platform]}"
-            dest="Wails/resources/xray/${platform}"
+            dest="resources/xray/${platform}"
             mkdir -p "$dest"
 
             echo "::group::${platform}"
@@ -97,10 +97,10 @@ jobs:
             echo "${VERSION}" > "${dest}/VERSION"
 
             if [ "$GEO_EXTRACTED" = false ]; then
-              mkdir -p Wails/resources/geo
-              cp /tmp/extract/geoip.dat Wails/resources/geo/
-              cp /tmp/extract/geosite.dat Wails/resources/geo/
-              echo "${VERSION}" > Wails/resources/geo/VERSION
+              mkdir -p resources/geo
+              cp /tmp/extract/geoip.dat resources/geo/
+              cp /tmp/extract/geosite.dat resources/geo/
+              echo "${VERSION}" > resources/geo/VERSION
               GEO_EXTRACTED=true
               echo "Geo files extracted from ${zip}"
             fi
@@ -110,14 +110,14 @@ jobs:
           done
 
           echo "::group::Resource summary"
-          find Wails/resources -type f | sort
+          find resources -type f | sort
           echo "::endgroup::"
 
       - name: Upload resources artifact
         uses: actions/upload-artifact@v4
         with:
           name: resources
-          path: Wails/resources/
+          path: resources/
           retention-days: 1
 
   build-macos-arm64:
@@ -145,23 +145,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: resources
-          path: Wails/resources/
+          path: resources/
 
       - name: Download icons
         uses: actions/download-artifact@v4
         with:
           name: icons
-          path: Wails/
+          path: .
 
       - name: Install Pillow
         run: pip install Pillow
 
       - name: Generate macOS .icns
-        working-directory: Wails
+        working-directory: .
         run: python3 tools/icongen/main.py --project-root . --source build/appicon.png
 
       - name: Trim resources to platform
-        working-directory: Wails
+        working-directory: .
         run: |
           PLATFORM="darwin-arm64-v8a"
           for dir in resources/xray/*/; do
@@ -172,16 +172,16 @@ jobs:
           find resources -type f | sort
 
       - name: Build application
-        working-directory: Wails
+        working-directory: .
         run: wails build -platform darwin/arm64
 
       - name: Bundle resources into app
-        working-directory: Wails
+        working-directory: .
         run: |
           cp -R resources/ build/bin/SwiftRay.app/Contents/Resources/
 
       - name: Create DMG
-        working-directory: Wails/build/bin
+        working-directory: build/bin
         run: |
           STAGING=$(mktemp -d)
           cp -R SwiftRay.app "$STAGING/"
@@ -193,7 +193,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SwiftRay-macos-arm64
-          path: Wails/build/bin/SwiftRay-macos-arm64.dmg
+          path: build/bin/SwiftRay-macos-arm64.dmg
 
   build-macos-amd64:
     needs: [fetch-xray, generate-icons]
@@ -220,23 +220,23 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: resources
-          path: Wails/resources/
+          path: resources/
 
       - name: Download icons
         uses: actions/download-artifact@v4
         with:
           name: icons
-          path: Wails/
+          path: .
 
       - name: Install Pillow
         run: pip install Pillow
 
       - name: Generate macOS .icns
-        working-directory: Wails
+        working-directory: .
         run: python3 tools/icongen/main.py --project-root . --source build/appicon.png
 
       - name: Trim resources to platform
-        working-directory: Wails
+        working-directory: .
         run: |
           PLATFORM="darwin-amd64"
           for dir in resources/xray/*/; do
@@ -247,7 +247,7 @@ jobs:
           find resources -type f | sort
 
       - name: Build application
-        working-directory: Wails
+        working-directory: .
         env:
           GOARCH: amd64
           CGO_ENABLED: '1'
@@ -255,12 +255,12 @@ jobs:
         run: wails build -platform darwin/amd64
 
       - name: Bundle resources into app
-        working-directory: Wails
+        working-directory: .
         run: |
           cp -R resources/ build/bin/SwiftRay.app/Contents/Resources/
 
       - name: Create DMG
-        working-directory: Wails/build/bin
+        working-directory: build/bin
         run: |
           STAGING=$(mktemp -d)
           cp -R SwiftRay.app "$STAGING/"
@@ -272,7 +272,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SwiftRay-macos-amd64
-          path: Wails/build/bin/SwiftRay-macos-amd64.dmg
+          path: build/bin/SwiftRay-macos-amd64.dmg
 
   build-windows:
     needs: [fetch-xray, generate-icons]
@@ -295,16 +295,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: resources
-          path: Wails/resources/
+          path: resources/
 
       - name: Download icons
         uses: actions/download-artifact@v4
         with:
           name: icons
-          path: Wails/
+          path: .
 
       - name: Trim resources to platform
-        working-directory: Wails
+        working-directory: .
         shell: bash
         run: |
           PLATFORM="windows-amd64"
@@ -315,16 +315,16 @@ jobs:
           find resources -type f | sort
 
       - name: Build application and installer
-        working-directory: Wails
+        working-directory: .
         run: wails build -platform windows/amd64
 
       - name: Copy resources into build output
-        working-directory: Wails
+        working-directory: .
         shell: bash
         run: cp -R resources/ build/bin/resources/
 
       - name: Package portable ZIP
-        working-directory: Wails/build/bin
+        working-directory: build/bin
         shell: bash
         run: 7z a -tzip "SwiftRay-windows-amd64.zip" SwiftRay.exe resources/
 
@@ -332,7 +332,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: SwiftRay-windows
-          path: Wails/build/bin/SwiftRay-windows-amd64.zip
+          path: build/bin/SwiftRay-windows-amd64.zip
 
   build-linux-amd64:
     needs: [fetch-xray, generate-icons]
@@ -365,16 +365,16 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: resources
-          path: Wails/resources/
+          path: resources/
 
       - name: Download icons
         uses: actions/download-artifact@v4
         with:
           name: icons
-          path: Wails/
+          path: .
 
       - name: Trim resources to platform
-        working-directory: Wails
+        working-directory: .
         run: |
           PLATFORM="linux-amd64"
           for dir in resources/xray/*/; do
@@ -385,24 +385,24 @@ jobs:
           find resources -type f | sort
 
       - name: Build application
-        working-directory: Wails
+        working-directory: .
         env:
           CGO_CFLAGS: "-DWEBKITGTK_4_1"
         run: wails build -platform linux/amd64 -tags webkit2_41
 
       - name: Copy resources into build output
-        working-directory: Wails
+        working-directory: .
         run: cp -R resources/ build/bin/resources/
 
       - name: Package tar.gz
-        working-directory: Wails/build/bin
+        working-directory: build/bin
         run: tar czf "SwiftRay-linux-amd64.tar.gz" SwiftRay resources/
 
       - name: Upload tar.gz
         uses: actions/upload-artifact@v4
         with:
           name: SwiftRay-linux-amd64
-          path: Wails/build/bin/SwiftRay-linux-amd64.tar.gz
+          path: build/bin/SwiftRay-linux-amd64.tar.gz
 
   release:
     needs: [build-macos-arm64, build-macos-amd64, build-windows, build-linux-amd64]

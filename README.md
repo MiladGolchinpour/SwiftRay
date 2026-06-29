@@ -24,16 +24,14 @@ It focuses on being lightweight, fast and easy to use while providing a simple d
 - Windows x64
 - Linux x64
 
-## Installation
-
-Download the latest release from the Releases page.
+## Download & Installation
 
 | Platform | Package |
 |----------|---------|
-| macOS Apple Silicon | `.dmg` |
-| macOS Intel | `.dmg` |
-| Windows | Portable ZIP |
-| Linux | `.tar.gz` |
+| macOS Apple Silicon | [SwiftRay-macos-arm64.dmg](https://github.com/MiladGolchinpour/SwiftRay/releases/download/v0.1.0/SwiftRay-macos-arm64.dmg) |
+| macOS Intel | [SwiftRay-macos-amd64.dmg](https://github.com/MiladGolchinpour/SwiftRay/releases/download/v0.1.0/SwiftRay-macos-amd64.dmg) |
+| Windows x64 (Portable ZIP) | [SwiftRay-windows-amd64.zip](https://github.com/MiladGolchinpour/SwiftRay/releases/download/v0.1.0/SwiftRay-windows-amd64.zip) |
+| Linux x64 | [SwiftRay-linux-amd64.tar.gz](https://github.com/MiladGolchinpour/SwiftRay/releases/download/v0.1.0/SwiftRay-linux-amd64.tar.gz) |
 
 ## Build
 
@@ -63,8 +61,6 @@ frontend/     Vue 3 frontend
 resources/    Bundled Xray runtime
 tools/        Resource manager & utilities
 ```
-
-There is also a Swift version which provides native macOS (Apple Silicon) experience.
 
 ## License
 
